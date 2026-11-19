@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Malaysia Headline Reader</title>
+<style>
+  :root{
+    --bg:#faf9f6; --card:#ffffff; --ink:#2d2a26; --muted:#78736b;
+    --line:#e7e3da; --line-strong:#d6d0c3;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    line-height:1.55; -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:860px; margin:0 auto; padding:36px 20px 60px}
+
+  header{margin-bottom:30px}
+  header h1{font-size:1.65rem; margin:0 0 6px; letter-spacing:-.01em}
+  header p{margin:0; color:var(--muted); font-size:.95rem}
+  .notice{display:inline-block; margin-top:12px; font-size:.78rem; color:var(--muted);
+    background:var(--card); border:1px solid var(--line); border-radius:999px; padding:4px 12px}
+
+  section{margin-bottom:36px}
+  .sec-head{display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:12px}
+  .sec-head h2{font-size:1.12rem; margin:0}
+  .purpose{color:var(--muted); font-size:.85rem; margin:2px 0 0}
+  .set-label{font-size:.78rem; color:var(--muted); margin-top:10px}
+
+  button{font:inherit; cursor:pointer}
+  .refresh-btn{background:var(--card); border:1px solid var(--line-strong); border-radius:8px;
+    padding:7px 14px; font-size:.85rem; color:var(--ink); transition:background .15s, border-color .15s}
+  .refresh-btn:hover{background:#f3f1ec; border-color:#c4bcaa}
+  .refresh-btn:active{transform:translateY(1px)}
+
+  .card{background:var(--card); border:1px solid var(--line); border-radius:12px}
+
+  /* Section 1: Headline Sources */
+  .sources{display:flex; flex-direction:column; gap:10px}
+  .headline-btn{display:block; width:100%; text-align:left; padding:14px 18px;
+    border:1px solid var(--line); border-left:4px solid var(--accent,#999); border-radius:12px;
+    background:var(--card); transition:border-color .15s, background .15s}
+  .headline-btn:hover{border-color:var(--line-strong); background:#fdfcfa}
+  .headline-btn.selected{background:var(--tint,#f6f6f6); border-color:var(--accent,#999); box-shadow:0 1px 4px rgba(0,0,0,.05)}
+  .outlet{font-size:.72rem; font-weight:700; letter-spacing:.07em; text-transform:uppercase; color:var(--accent,#777)}
+  .headline-text{font-size:1.02rem; font-weight:600; margin:4px 0 2px}
+  .tap-hint{font-size:.78rem; color:var(--muted)}
+
+  /* Section 2: English Summary */
+  .summary-card{padding:18px 20px}
+  .summary-meta{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:10px}
+  .badge{font-size:.72rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase;
+    color:#fff; background:var(--accent,#888); border-radius:6px; padding:3px 9px}
+  .original{font-size:.85rem; color:var(--muted)}
+  .summary-text{margin:0; font-size:1.05rem}
+
+  /* Section 3: Comparison View */
+  .compare-list{display:flex; flex-direction:column; gap:10px}
+  .compare-card{padding:14px 18px; border-left:4px solid var(--accent,#999)}
+  .compare-headline{font-size:.98rem; font-weight:600; margin:3px 0 8px}
+  .compare-summary{margin:0; font-size:.9rem; color:#4a463f}
+  @media (min-width:720px){
+    .compare-list{display:grid; grid-template-columns:repeat(3,1fr); align-items:stretch}
+  }
+
+  footer{margin-top:40px; font-size:.78rem; color:var(--muted); text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>Malaysia Headline Reader</h1>
+    <p>Compare today&rsquo;s top headline from The Star, BHarian and eNanyang &mdash; each summarized in plain English.</p>
+    <span class="notice">Sample content for demonstration &mdash; not live news</span>
+  </header>
+
+  <section id="sources-section" aria-labelledby="sources-title">
+    <div class="sec-head">
+      <div>
+        <h2 id="sources-title">Headline Sources</h2>
+        <p class="purpose">The latest top headline from each outlet. Tap a headline to read its English summary.</p>
+      </div>
+      <button class="refresh-btn" id="refresh-top" type="button">&#8635; Refresh headlines</button>
+    </div>
+    <div class="sources" id="sources"></div>
+    <p class="set-label" id="set-label"></p>
+  </section>
+
+  <section id="summary-section" aria-labelledby="summary-title">
+    <div class="sec-head">
+      <div>
+        <h2 id="summary-title">English Summary</h2>
+        <p class="purpose">A short plain-English summary of the headline you selected.</p>
+      </div>
+    </div>
+    <div class="card summary-card" id="summary-card"></div>
+  </section>
+
+  <section id="compare-section" aria-labelledby="compare-title">
+    <div class="sec-head">
+      <div>
+        <h2 id="compare-title">Comparison View</h2>
+        <p class="purpose">All three outlets side by side &mdash; scan the headlines and summaries at a glance.</p>
+      </div>
+      <button class="refresh-btn" id="refresh-bottom" type="button">&#8635; Refresh &amp; compare</button>
+    </div>
+    <div class="compare-list" id="compare"></div>
+  </section>
+
+  <footer>All headlines and summaries are made-up examples created for this demo. Nothing is saved between visits.</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var OUTLETS = [
+    { id:"star",     name:"The Star",  lang:"en", color:"#2f6db3", tint:"#f0f5fb" },
+    { id:"bharian",  name:"BHarian",   lang:"ms", color:"#b23a3a", tint:"#faf1f0" },
+    { id:"enanyang", name:"eNanyang",  lang:"zh", color:"#c07a2a", tint:"#faf5ee" }
+  ];
+
+  var SAMPLE_SETS = [
+    {
+      star:     { h:"Kuala Lumpur opens new riverside walkway along the Klang River",
+                  s:"Kuala Lumpur has opened a new walking path beside the Klang River, giving residents a calm green space for evening strolls and jogging in the city centre." },
+      bharian:  { h:"Pasar malam Johor Bahru tarik pelawat saban malam",
+                  s:"A popular night market in Johor Bahru is drawing steady crowds, with vendors saying families come for street food and affordable finds after sunset." },
+      enanyang: { h:"槟城壁画村成为游客新打卡点",
+                  s:"A mural spot in Penang has become a favourite photo stop for visitors, as heritage streets fill with people exploring the art on old shophouse walls." }
+    },
+    {
+      star:     { h:"Penang ferry service adds weekend sailings for festival crowds",
+                  s:"The Penang ferry is adding extra weekend trips between the island and the mainland to carry more passengers during the festive season." },
+      bharian:  { h:"Cameron Highlands farmers adopt greenhouse methods",
+                  s:"Vegetable farmers in Cameron Highlands are trying greenhouse growing to shield their crops from unpredictable weather on the highland slopes." },
+      enanyang: { h:"马六甲老街咖啡馆吸引年轻顾客",
+                  s:"Caf\u00e9s in Malacca's old quarter are winning over younger customers, blending heritage shophouse charm with local coffee and dessert culture." }
+    },
+    {
+      star:     { h:"Sarawak rainforest trail named a standout nature destination",
+                  s:"A rainforest walking trail in Sarawak has been listed among the country's standout nature spots, drawing trekkers keen to see ancient trees and wildlife." },
+      bharian:  { h:"KTM adds weekend train services to the East Coast",
+                  s:"The national railway is adding extra weekend trains to the East Coast, giving travellers more options to visit family and coastal towns." },
+      enanyang: { h:"吉隆坡茨厂街推出文化导览活动",
+                  s:"Petaling Street in Kuala Lumpur has launched guided cultural walks, taking visitors through the neighbourhood's history, food stalls and temples." }
+    },
+    {
+      star:     { h:"Kelantan kite makers keep the traditional wau craft aloft",
+                  s:"Artisans in Kelantan are keeping the traditional wau bulan kite alive, handcrafting the moon kite that has long been a symbol of the state." },
+      bharian:  { h:"Langkawi pursues nature-friendly tourism",
+                  s:"Langkawi is pushing nature-friendly tourism, with operators offering mangrove boat tours and wildlife walks that protect the island's environment." },
+      enanyang: { h:"怡保旧街场壁画与白咖啡受旅客欢迎",
+                  s:"Ipoh's old town is winning visitors with its street murals and famous white coffee, as day-trippers explore its colonial-era shophouses." }
+    },
+    {
+      star:     { h:"Sabah island cleanup brings volunteers together for the weekend",
+                  s:"Volunteers gathered on an island off Sabah's coast for a weekend cleanup, clearing plastic waste from the beach and nearby reefs." },
+      bharian:  { h:"Local university builds an app to track city buses",
+                  s:"A local university has built a mobile app that lets city bus riders track arrival times, aimed at making public transport easier to use." },
+      enanyang: { h:"雪兰莪社区农场推动都市种菜",
+                  s:"A community farm in Selangor is encouraging city dwellers to grow their own vegetables, offering plots and hands-on workshops to nearby residents." }
+    }
+  ];
+
+  var setIndex = 0;
+  var selectedId = "star";
+
+  function outletById(id){
+    for (var i = 0; i < OUTLETS.length; i++){
+      if (OUTLETS[i].id === id) return OUTLETS[i];
+    }
+    return OUTLETS[0];
+  }
+
+  function currentEntry(outletId){
+    return SAMPLE_SETS[setIndex][outletId];
+  }
+
+  function el(tag, className, text){
+    var node = document.createElement(tag);
+    if (className) node.className = className;
+    if (text !== undefined) node.textContent = text;
+    return node;
+  }
+
+  function renderSources(){
+    var box = document.getElementById("sources");
+    box.innerHTML = "";
+    OUTLETS.forEach(function(outlet){
+      var entry = currentEntry(outlet.id);
+      var btn = el("button", "headline-btn");
+      btn.type = "button";
+      btn.style.setProperty("--accent", outlet.color);
+      btn.style.setProperty("--tint", outlet.tint);
+      if (outlet.id === selectedId) btn.classList.add("selected");
+
+      btn.appendChild(el("span", "outlet", outlet.name));
+      var headline = el("div", "headline-text", entry.h);
+      headline.lang = outlet.lang;
+      btn.appendChild(headline);
+      btn.appendChild(el("div", "tap-hint", "Tap to read the English summary"));
+
+      btn.addEventListener("click", function(){
+        select(outlet.id);
+      });
+      box.appendChild(btn);
+    });
+    document.getElementById("set-label").textContent =
+      "Sample set " + (setIndex + 1) + " of " + SAMPLE_SETS.length;
+  }
+
+  function renderSummary(){
+    var outlet = outletById(selectedId);
+    var entry = currentEntry(outlet.id);
+    var card = document.getElementById("summary-card");
+    card.style.setProperty("--accent", outlet.color);
+    card.innerHTML = "";
+
+    var meta = el("div", "summary-meta");
+    meta.appendChild(el("span", "badge", outlet.name));
+    var original = el("span", "original", "\u201c" + entry.h + "\u201d");
+    original.lang = outlet.lang;
+    meta.appendChild(original);
+    card.appendChild(meta);
+    card.appendChild(el("p", "summary-text", entry.s));
+  }
+
+  function renderCompare(){
+    var box = document.getElementById("compare");
+    box.innerHTML = "";
+    OUTLETS.forEach(function(outlet){
+      var entry = currentEntry(outlet.id);
+      var card = el("div", "card compare-card");
+      card.style.setProperty("--accent", outlet.color);
+
+      card.appendChild(el("div", "outlet", outlet.name));
+      var headline = el("div", "compare-headline", entry.h);
+      headline.lang = outlet.lang;
+      card.appendChild(headline);
+      card.appendChild(el("p", "compare-summary", entry.s));
+      box.appendChild(card);
+    });
+  }
+
+  function renderAll(){
+    renderSources();
+    renderSummary();
+    renderCompare();
+  }
+
+  function select(outletId){
+    selectedId = outletId;
+    renderSources();
+    renderSummary();
+    document.getElementById("summary-card").scrollIntoView({behavior:"smooth", block:"nearest"});
+  }
+
+  function refresh(){
+    setIndex = (setIndex + 1) % SAMPLE_SETS.length;
+    renderAll();
+  }
+
+  document.getElementById("refresh-top").addEventListener("click", refresh);
+  document.getElementById("refresh-bottom").addEventListener("click", refresh);
+
+  renderAll();
+})();
+</script>
+</body>
+</html>
